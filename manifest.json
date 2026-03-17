@@ -1,0 +1,15 @@
+{
+  "id": "com.compass.bilibili",
+  "name": "Bilibili 音乐",
+  "version": "0.2.0",
+  "description": "搜索和播放 Bilibili 上的音乐视频",
+  "author": "Compass Music Team",
+  "platforms": [
+    "all"
+  ],
+  "main": "dist/index.js",
+  "brandColor": "#d33682",
+  "capabilities": {
+    "dataSource": true
+  }
+}
