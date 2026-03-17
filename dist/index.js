@@ -1,4 +1,4 @@
-import md5 from 'md5';
+import { createHash } from 'node:crypto';
 
 // src/index.ts
 var manifest = {
@@ -128,7 +128,7 @@ var WbiSigner = class _WbiSigner {
       const value = allParams[k];
       return `${encodeURIComponent(k)}=${encodeURIComponent(this.sanitize(value ?? ""))}`;
     }).join("&");
-    return `${sortedQuery}&w_rid=${md5(sortedQuery + mixinKey)}`;
+    return `${sortedQuery}&w_rid=${createHash("md5").update(sortedQuery + mixinKey).digest("hex")}`;
   }
   extractKey(url) {
     const filename = url.substring(url.lastIndexOf("/") + 1);

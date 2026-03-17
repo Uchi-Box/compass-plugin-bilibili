@@ -1,4 +1,4 @@
-import md5 from 'md5'
+import { createHash } from 'node:crypto'
 import type {
   DataSourcePlugin,
   DataSourceSearchResult,
@@ -142,7 +142,7 @@ class WbiSigner {
       })
       .join('&')
 
-    return `${sortedQuery}&w_rid=${md5(sortedQuery + mixinKey)}`
+    return `${sortedQuery}&w_rid=${createHash('md5').update(sortedQuery + mixinKey).digest('hex')}`
   }
 
   private extractKey(url: string): string {
