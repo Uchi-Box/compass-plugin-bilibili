@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { BilibiliDataSourcePlugin } from '../src/index'
-import type { PluginContext } from './compass-plugin'
+import type { PluginContext } from '@uchi-box/compass-plugin-sdk'
 
 const mockFetch = vi.fn()
 global.fetch = mockFetch

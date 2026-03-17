@@ -9,7 +9,7 @@ import type {
   StreamInfo,
   TrackMetadata,
   TrackReference
-} from './compass-plugin'
+} from '@uchi-box/compass-plugin-sdk'
 
 const manifest: PluginManifest = {
   id: 'com.compass.bilibili',
