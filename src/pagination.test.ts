@@ -5,10 +5,9 @@ const mockFetch = vi.fn()
 
 describe('BilibiliDataSourcePlugin pagination', () => {
   const mockContext = {
-    manifest: { id: 'test', name: 'Test' },
+    config: { get: vi.fn(), set: vi.fn(), observe: vi.fn() },
     fetch: mockFetch,
-    getSetting: vi.fn(),
-    setSetting: vi.fn(),
+    storage: { get: vi.fn(), set: vi.fn(), delete: vi.fn(), keys: vi.fn() },
     registerProtocol: vi.fn(),
     log: vi.fn()
   }
@@ -19,6 +18,7 @@ describe('BilibiliDataSourcePlugin pagination', () => {
       if (url.includes('/nav')) {
         return {
           ok: true,
+          headers: new Headers({ 'content-type': 'application/json' }),
           json: async () => ({
             code: 0,
             data: {
@@ -36,6 +36,7 @@ describe('BilibiliDataSourcePlugin pagination', () => {
       if (url.includes('/finger/spi')) {
         return {
           ok: true,
+          headers: new Headers({ 'content-type': 'application/json' }),
           json: async () => ({
             code: 0,
             data: { b_3: 'test-buvid3', b_4: 'test-buvid4' }
@@ -46,6 +47,7 @@ describe('BilibiliDataSourcePlugin pagination', () => {
       if (url.includes('/wbi/search/type')) {
         return {
           ok: true,
+          headers: new Headers({ 'content-type': 'application/json' }),
           json: async () => ({
             code: 0,
             data: {
@@ -80,7 +82,7 @@ describe('BilibiliDataSourcePlugin pagination', () => {
       title: '分页结果',
       artist: '测试UP主',
       duration: 210,
-      source: 'com.compass.bilibili'
+      source: 'compass-plugin-bilibili'
     })
 
     const searchCall = mockFetch.mock.calls.find(([url]) =>

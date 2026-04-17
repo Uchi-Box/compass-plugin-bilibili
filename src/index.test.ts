@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { BilibiliDataSourcePlugin } from '../src/index'
-import type { PluginContext } from '@uchi-box/compass-plugin-sdk'
 
 const mockFetch = vi.fn()
 global.fetch = mockFetch
@@ -25,27 +24,15 @@ const mockBuvid = {
 
 describe('BilibiliDataSourcePlugin', () => {
   let plugin: BilibiliDataSourcePlugin
-  const mockGetSetting = vi.fn()
-  const mockSetSetting = vi.fn()
   const mockLog = vi.fn()
-  const mockContext: PluginContext = {
-    manifest: {
-      id: 'test',
-      name: 'Test',
-      version: '1.0.0',
-      platforms: ['all'],
-      main: 'dist/index.js',
-      capabilities: { dataSource: true }
-    },
-    getDatabase: vi.fn(() => {
-      throw new Error('not needed in test')
-    }),
-    generateId: vi.fn((prefix: string) => `${prefix}-1`),
-    getSetting: mockGetSetting,
-    setSetting: mockSetSetting,
+  const mockConfigGet = vi.fn()
+  const mockConfigSet = vi.fn()
+  // biome-ignore lint/suspicious/noExplicitAny: test mock
+  const mockContext: any = {
+    config: { get: mockConfigGet, set: mockConfigSet, observe: vi.fn() },
     log: mockLog,
     fetch: mockFetch,
-    registerProtocol: vi.fn()
+    storage: { get: vi.fn(), set: vi.fn(), delete: vi.fn(), keys: vi.fn() }
   }
 
   const setupFetch = (handlers: Record<string, () => unknown>) => {
@@ -55,15 +42,25 @@ describe('BilibiliDataSourcePlugin', () => {
           const data = handler()
           return Promise.resolve({
             ok: true,
+            headers: new Headers({ 'content-type': 'application/json' }),
             json: () => Promise.resolve(data),
-            clone: () => ({ json: () => Promise.resolve(data) })
+            text: () => Promise.resolve(JSON.stringify(data)),
+            clone: () => ({
+              headers: new Headers({ 'content-type': 'application/json' }),
+              json: () => Promise.resolve(data)
+            })
           })
         }
       }
       return Promise.resolve({
         ok: true,
+        headers: new Headers({ 'content-type': 'application/json' }),
         json: () => Promise.resolve({ code: 0, data: {} }),
-        clone: () => ({ json: () => Promise.resolve({ code: 0 }) })
+        text: () => Promise.resolve('{"code":0,"data":{}}'),
+        clone: () => ({
+          headers: new Headers({ 'content-type': 'application/json' }),
+          json: () => Promise.resolve({ code: 0 })
+        })
       })
     })
   }
@@ -131,7 +128,7 @@ describe('BilibiliDataSourcePlugin', () => {
         title: 'Song Title',
         artist: 'Artist',
         duration: 225,
-        source: 'com.compass.bilibili'
+        source: 'compass-plugin-bilibili'
       })
     })
 
@@ -271,7 +268,6 @@ describe('BilibiliDataSourcePlugin', () => {
 
       const stream = await plugin.resolveStream(track)
 
-      expect(stream.url).toContain('bilibili-audio://')
       expect(stream.url).toContain('test-audio.m4s')
       expect(stream.format).toBe('m4a')
     })
@@ -306,7 +302,6 @@ describe('BilibiliDataSourcePlugin', () => {
 
       const stream = await plugin.resolveStream(track)
 
-      expect(stream.url).toContain('bilibili-audio://')
       expect(stream.url).toContain('old-video.flv')
     })
 

@@ -285,8 +285,8 @@ class BilibiliDataSourcePlugin {
     this.context = context
     this.platform = context.platform
     this.settings = {
-      searchLimit: context.config.get<number>('searchLimit') ?? 20,
-      preferHighQuality: context.config.get<boolean>('preferHighQuality') ?? true
+      searchLimit: (context.config.get('searchLimit') as number | undefined) ?? 20,
+      preferHighQuality: (context.config.get('preferHighQuality') as boolean | undefined) ?? true
     }
 
     // Use platform fetch (Chromium net.fetch) if available for better compatibility
@@ -389,14 +389,14 @@ class BilibiliDataSourcePlugin {
   }
 
   private registerProtocols(context: any): void {
-    context.registerProtocol?.('bilibili-img', async req => {
+    context.registerProtocol?.('bilibili-img', async (req: any) => {
       const resp = await biliFetch(req.url, {
         headers: { Accept: 'image/*,*/*;q=0.8' }
       })
       return { data: resp, statusCode: resp.status }
     })
 
-    context.registerProtocol?.('bilibili-audio', async req => {
+    context.registerProtocol?.('bilibili-audio', async (req: any) => {
       const resp = await biliFetch(req.url, {
         headers: {
           'Accept-Encoding': 'identity;q=1, *;q=0',
